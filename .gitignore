@@ -46,6 +46,7 @@ nbproject/
 .buildpath
 .idea
 .project
+.vscode
 .settings
 *.sublime-project
 *.sublime-workspace
