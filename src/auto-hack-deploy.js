@@ -17,11 +17,21 @@ export async function main(ns) {
     };
 
     let stockSymbols = [];
-		
+        
     try {
         stockSymbols = ns.stock.getSymbols();
     } catch (e) {
         ns.print("TIX API Access not available.");
+    }
+
+    function formatMoney(amount) {
+        if (amount >= 1e9) {
+            return `$${Math.floor(amount / 1e9)}B`;
+        } else if (amount >= 1e6) {
+            return `$${Math.floor(amount / 1e6)}M`;
+        } else {
+            return `$${amount.toLocaleString()}`;
+        }
     }
 
     // Function to get the number of cracks available
@@ -108,6 +118,13 @@ export async function main(ns) {
             const bestTarget = getBestTarget();
             if (bestTarget) {
                 await copyAndRunVirus(serv, bestTarget);
+                ns.print(`Targeting server: ${bestTarget}`);
+                ns.print(`Server security: ${ns.getServerSecurityLevel(bestTarget)}`);
+                ns.print(`Server money: ${formatMoney(ns.getServerMoneyAvailable(bestTarget))}`);
+                ns.print(`Weaken time: ${ns.tFormat(ns.getWeakenTime(bestTarget))}`);
+                ns.print(`Grow time: ${ns.tFormat(ns.getGrowTime(bestTarget))}`);
+                ns.print(`Hack time: ${ns.tFormat(ns.getHackTime(bestTarget))}`);
+                ns.print(`Potential money gain: ${formatMoney(ns.getServerMaxMoney(bestTarget) * 0.5)}`); // Example calculation
             }
         }
     }
