@@ -34,12 +34,10 @@ export async function main(ns) {
 		}
 	}
 
-	// Function to get the number of cracks available
 	function getNumCracks() {
 		return Object.keys(cracks).filter(file => ns.fileExists(file, homeServer)).length;
 	}
 
-	// Function to penetrate a server
 	function penetrate(server) {
 		for (const file of Object.keys(cracks)) {
 			if (ns.fileExists(file, homeServer)) {
@@ -48,7 +46,6 @@ export async function main(ns) {
 		}
 	}
 
-	// Function to copy and run the virus on a server
 	async function copyAndRunVirus(server, target) {
 		await ns.scp(virus, server);
 
@@ -68,7 +65,6 @@ export async function main(ns) {
 		ns.exec(virus, server, maxThreads, target);
 	}
 
-	// Function to get all network nodes
 	function getNetworkNodes() {
 		const visited = new Set();
 		const stack = ["home"];
@@ -83,7 +79,6 @@ export async function main(ns) {
 		return Array.from(visited);
 	}
 
-	// Function to check if a server can be hacked
 	function canHack(server) {
 		const numCracks = getNumCracks();
 		const reqPorts = ns.getServerNumPortsRequired(server);
@@ -93,7 +88,6 @@ export async function main(ns) {
 		return numCracks >= reqPorts && ramAvail > virusRam && hackingSkill >= serverRequiredSkill;
 	}
 
-	// Function to get the best target
 	function getBestTarget() {
 		const networkNodes = getNetworkNodes().filter(node => canHack(node));
 		let bestServer = null;
@@ -114,12 +108,29 @@ export async function main(ns) {
 		return bestServer;
 	}
 
-	// Function to deploy hacks to targets
+	function getTargetServers() {
+		var networkNodes = getNetworkNodes();
+		const targets = networkNodes.filter(function (node) { return canHack(node); });
+
+		// Add purchased servers
+		var i = 0;
+		var servPrefix = "pserv-";
+
+		while (ns.serverExists(servPrefix + i)) {
+			targets.push(servPrefix + i);
+			++i;
+		}
+
+		return targets;
+	}
+
 	async function deployHacks(targets) {
 		for (const serv of targets) {
 			const bestTarget = getBestTarget();
+
 			if (bestTarget) {
 				await copyAndRunVirus(serv, bestTarget);
+
 				ns.clearLog();
 				ns.print(`Targeting server: ${bestTarget}`);
 				ns.print(`Server security: ${ns.getServerSecurityLevel(bestTarget)}`);
@@ -132,99 +143,24 @@ export async function main(ns) {
 		}
 	}
 
-	// Function to manage Hacknet nodes
-	async function manageHacknet() {
-		const maxNodes = 20;
-		const upgradeLimit = 10;
-
-		while (true) {
-			if (ns.hacknet.numNodes() < maxNodes) {
-				if (ns.getPlayer().money > ns.hacknet.getPurchaseNodeCost()) {
-					ns.hacknet.purchaseNode();
-				}
-			}
-
-			for (let i = 0; i < ns.hacknet.numNodes(); i++) {
-				const cheapestUpgrade = Math.min(
-					ns.hacknet.getLevelUpgradeCost(i, 1),
-					ns.hacknet.getRamUpgradeCost(i, 1),
-					ns.hacknet.getCoreUpgradeCost(i, 1)
-				);
-
-				if (ns.getPlayer().money > cheapestUpgrade) {
-					if (cheapestUpgrade === ns.hacknet.getLevelUpgradeCost(i, 1) && ns.hacknet.getNodeStats(i).level < upgradeLimit) {
-						ns.hacknet.upgradeLevel(i, 1);
-					} else if (cheapestUpgrade === ns.hacknet.getRamUpgradeCost(i, 1) && ns.hacknet.getNodeStats(i).ram < upgradeLimit) {
-						ns.hacknet.upgradeRam(i, 1);
-					} else if (cheapestUpgrade === ns.hacknet.getCoreUpgradeCost(i, 1) && ns.hacknet.getNodeStats(i).cores < upgradeLimit) {
-						ns.hacknet.upgradeCore(i, 1);
-					}
-				}
-			}
-
-			await ns.sleep(1000);
-		}
-	}
-
-	// Function to manage stocks
-	async function manageStocks() {
-		while (stockSymbols.length > 0) {
-			for (const symbol of stockSymbols) {
-				const position = ns.stock.getPosition(symbol);
-				const [shares, avgPrice, sharesShort, avgShortPrice] = position;
-				const forecast = ns.stock.getForecast(symbol);
-				const price = ns.stock.getPrice(symbol);
-				const playerMoney = ns.getPlayer().money;
-
-				if (forecast > threshold && playerMoney > minCash) {
-					const maxShares = ns.stock.getMaxShares(symbol);
-					const toBuy = Math.min(maxShares - shares, Math.floor((playerMoney - minCash) / price));
-					if (toBuy > 0) {
-						ns.stock.buy(symbol, toBuy);
-					}
-				}
-
-				if (forecast < 0.5 && shares > 0) {
-					ns.stock.sell(symbol, shares);
-				}
-			}
-			await ns.sleep(60000);
-		}
-	}
-
-	// Function to maximize XP gains
-	async function maximizeXPGains(target) {
-		const xpBefore = ns.getPlayer().hacking_exp;
-		await ns.hack(target);
-		const xpAfter = ns.getPlayer().hacking_exp;
-		const xpGained = xpAfter - xpBefore;
-		ns.print(`Gained XP: ${xpGained} from hacking ${target}`);
-	}
-
-	// Main script execution
-	const curTargets = [];
+	var curTargets = [];
 	const waitTime = 2000;
 
 	ns.run("manageHacknet.js");
+
 	if (stockSymbols.length > 0) {
 		ns.run("manageStocks.js");
 	}
 
 	while (true) {
-		ns.clearLog(); // Clear log at the start of each iteration
-
-		const newTargets = getNetworkNodes().filter(node => canHack(node));
+		var newTargets = getTargetServers();
 
 		if (newTargets.length !== curTargets.length) {
 			await deployHacks(newTargets);
-			curTargets.length = newTargets.length;
+
+			curTargets = newTargets;
 		}
 
-		const target = getBestTarget();
-
-		if (target) {
-			await maximizeXPGains(target);
-		}
 		await ns.sleep(waitTime);
 	}
 }
