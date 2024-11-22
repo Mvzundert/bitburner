@@ -122,6 +122,11 @@ export async function main(ns) {
 		return targets;
 	}
 
+	// Add this function to get the player's current money
+	function getPlayerMoney() {
+		return ns.getServerMoneyAvailable("home");
+	}
+
 	async function deployHacks(targets) {
 		for (const serv of targets) {
 			const bestTarget = getBestTarget();
@@ -131,7 +136,7 @@ export async function main(ns) {
 
 				ns.clearLog();
 				ns.print(`Targeting server: ${bestTarget}`);
-				ns.print(`Server security: ${ns.getServerSecurityLevel(bestTarget)}`);
+				ns.print(`Server security: ${Math.round(ns.getServerSecurityLevel(bestTarget))}`); // Rounding server security
 				ns.print(`Server money: ${formatMoney(ns.getServerMoneyAvailable(bestTarget))}`);
 				ns.print(`Weaken time: ${ns.tFormat(ns.getWeakenTime(bestTarget))}`);
 				ns.print(`Grow time: ${ns.tFormat(ns.getGrowTime(bestTarget))}`);
@@ -144,7 +149,9 @@ export async function main(ns) {
 	var curTargets = [];
 	const waitTime = 2000;
 
-	ns.run("manageHacknet.js");
+	if (getPlayerMoney() > 20e6) {
+		ns.exec("managehacknet.js", "home");
+	}
 
 	if (stockSymbols.length > 0) {
 		ns.run("manageStocks.js");
