@@ -5,8 +5,6 @@ export async function main(ns) {
 	const homeServer = "home";
 	const virus = "basic-hack.js";
 	const virusRam = ns.getScriptRam(virus);
-	const minCash = 1000000;
-	const threshold = 0.6;
 
 	const cracks = {
 		"BruteSSH.exe": ns.brutessh,
