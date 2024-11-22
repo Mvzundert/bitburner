@@ -15,7 +15,6 @@ export async function main(ns) {
     const sec = ns.getServerSecurityLevel(server);
     ns.tprint(`
 ${server}:
-    RAM        : ${ram[1]} / ${ram[0]} (${ram[1] / ram[0] * 100}%)
     $          : ${ns.nFormat(money, "$0.000a")} / ${ns.nFormat(maxMoney, "$0.000a")} (${(money / maxMoney * 100).toFixed(2)}%)
     security   : ${minSec.toFixed(2)} / ${sec.toFixed(2)}
     growth     : ${ns.getServerGrowth(server)}
