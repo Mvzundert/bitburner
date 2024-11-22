@@ -1,12 +1,15 @@
 /** @param {NS} ns **/
 export async function main(ns) {
+		ns.disableLog("ALL");
+
     const args = ns.flags([
         ['help', false],
         ['secThresh', 5],
         ['moneyThresh', 0.75],
         ['refreshRate', 200],
-        ['detailedLog', false]
+        ['detailedLog', true]
     ]);
+
     const hostname = args._[0];
 
     if (args.help || !hostname) {
@@ -16,7 +19,7 @@ export async function main(ns) {
         ns.tprint("--secThresh VALUE     Set security threshold (default: 5)");
         ns.tprint("--moneyThresh VALUE   Set money threshold percentage (default: 0.75)");
         ns.tprint("--refreshRate VALUE   Set refresh rate in milliseconds (default: 200)");
-        ns.tprint("--detailedLog         Enable detailed logging");
+        ns.tprint("--detailedLog         Disable detailed logging");
         ns.tprint("Example:");
         ns.tprint(`> run ${ns.getScriptName()} n00dles --secThresh 3 --moneyThresh 0.8 --refreshRate 100 --detailedLog`);
         return;
