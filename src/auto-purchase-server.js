@@ -1,5 +1,7 @@
 /** @param {NS} ns **/
 export async function main(ns) {
+	ns.disableLog("ALL");
+
 	var target = ns.args[0];
 	var homeServ = "home";
 	var pRam = 8; // purchased ram
@@ -58,6 +60,9 @@ export async function main(ns) {
 		var i = 0;
 		while (i < maxServers) {
 			var server = servPrefix + i;
+
+			ns.clearLog();
+			
 			if (ns.serverExists(server)) {
 				ns.print("Upgrading server " + server + " to " + pRam + "GB");
 				await upgradeServer(server);
@@ -67,6 +72,8 @@ export async function main(ns) {
 				await purchaseServer(server);
 				++i;
 			}
+
+
 		}
 	}
 
