@@ -96,6 +96,7 @@ export async function main(ns) {
 		const ramAvail = ns.getServerMaxRam(server);
 		const hackingSkill = ns.getHackingLevel();
 		const serverRequiredSkill = ns.getServerRequiredHackingLevel(server);
+
 		return numCracks >= reqPorts && ramAvail > virusRam && hackingSkill >= serverRequiredSkill;
 	}
 
@@ -149,6 +150,7 @@ export async function main(ns) {
 			await copyAndRunVirus(serv);
 
 			ns.clearLog();
+			ns.print(`Player Money: ${formatMoney(getPlayerMoney())}`);
 			ns.print(`Best server: ${bestTarget}`);
 			ns.print(`Targeting server: ${target}`);
 			ns.print(`Server security: ${Math.round(ns.getServerSecurityLevel(target))}`); // Rounding server security
@@ -162,14 +164,41 @@ export async function main(ns) {
 
 	var curTargets = [];
 	const waitTime = 2000;
+	const moneyThreshold = 20000000; // 20 million
 
-	if (getPlayerMoney() > 20e6) {
-		ns.exec("managehacknet.js", "home");
+
+	if (getPlayerMoney() > moneyThreshold) {
+		if (ns.scriptRunning("managehacknet.js", homeServer)) {
+			ns.print(`Script to manage hacknet nodes is already running.`);
+
+			return;
+		} else {
+			ns.print(`Script to manage hacknet nodes is starting...`);
+			ns.run("manageHacknet.js");
+		}
+
+		if (ns.scriptRunning("auto-buy-exe.js", homeServer)) {
+			ns.print(`Script to auto purchase exe's is already running.`);
+
+			return;
+		} else {
+			ns.print(`Script to auto purchase exe's is starting...`);
+			ns.run("auto-buy-exe.js");
+		}
 	}
 
 	if (stockSymbols.length > 0) {
-		ns.run("manageStocks.js");
+		if (ns.scriptRunning("manageStocks.js", homeServer)) {
+			ns.print(`Script to manage stocks is already running.`);
+
+			return;
+		} else {
+			ns.print(`Script to manage Stocks is starting...`);
+			ns.run("manageStocks.js");
+		}
 	}
+
+
 
 	while (true) {
 		var newTargets = getTargetServers();
