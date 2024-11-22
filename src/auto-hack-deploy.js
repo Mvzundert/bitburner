@@ -183,7 +183,7 @@ export async function main(ns) {
 			return;
 		} else {
 			ns.print(`Script to auto purchase exe's is starting...`);
-			ns.run("auto-buy-exe.js");
+			//ns.run("auto-buy-exe.js");
 		}
 	}
 
