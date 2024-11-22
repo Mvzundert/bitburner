@@ -88,6 +88,7 @@ export async function main(ns) {
 		}
 		return Object.keys(visited);
 	}
+
 	function canHack(server) {
 		const numCracks = getNumCracks();
 		const reqPorts = ns.getServerNumPortsRequired(server);
@@ -114,13 +115,14 @@ export async function main(ns) {
 				bestServer = server;
 			}
 		}
+
 		return bestServer;
 	}
 
 	function getTargetServers() {
 		var networkNodes = getNetworkNodes();
-		const targets = networkNodes.filter(function (node) { return canHack(node); });
 
+		const targets = networkNodes.filter(function (node) { return canHack(node); });
 		const bestTarget = getBestTarget();
 
 		targets.push(bestTarget);
