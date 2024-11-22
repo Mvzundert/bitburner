@@ -166,7 +166,6 @@ export async function main(ns) {
 	const waitTime = 2000;
 	const moneyThreshold = 20000000; // 20 million
 
-
 	if (getPlayerMoney() > moneyThreshold) {
 		if (ns.scriptRunning("managehacknet.js", homeServer)) {
 			ns.print(`Script to manage hacknet nodes is already running.`);
