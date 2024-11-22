@@ -2,6 +2,7 @@
 export async function main(ns) {
 	ns.disableLog("ALL");
 
+	const target = ns.args[0];
 	const homeServer = "home";
 	const virus = "basic-hack.js";
 	const virusRam = ns.getScriptRam(virus);
@@ -46,7 +47,7 @@ export async function main(ns) {
 		}
 	}
 
-	async function copyAndRunVirus(server, target) {
+	async function copyAndRunVirus(server) {
 		await ns.scp(virus, server);
 
 		if (!ns.hasRootAccess(server)) {
@@ -123,9 +124,6 @@ export async function main(ns) {
 		var networkNodes = getNetworkNodes();
 
 		const targets = networkNodes.filter(function (node) { return canHack(node); });
-		const bestTarget = getBestTarget();
-
-		targets.push(bestTarget);
 
 		// Add purchased servers
 		var i = 0;
@@ -145,21 +143,20 @@ export async function main(ns) {
 	}
 
 	async function deployHacks(targets) {
-		for (const serv of targets) {
-			const bestTarget = getBestTarget();
+		const bestTarget = getBestTarget();
 
-			if (bestTarget) {
-				await copyAndRunVirus(serv, bestTarget);
+		for (var serv of targets) {
+			await copyAndRunVirus(serv);
 
-				ns.clearLog();
-				ns.print(`Targeting server: ${bestTarget}`);
-				ns.print(`Server security: ${Math.round(ns.getServerSecurityLevel(bestTarget))}`); // Rounding server security
-				ns.print(`Server money: ${formatMoney(ns.getServerMoneyAvailable(bestTarget))}`);
-				ns.print(`Weaken time: ${ns.tFormat(ns.getWeakenTime(bestTarget))}`);
-				ns.print(`Grow time: ${ns.tFormat(ns.getGrowTime(bestTarget))}`);
-				ns.print(`Hack time: ${ns.tFormat(ns.getHackTime(bestTarget))}`);
-				ns.print(`Potential money gain: ${formatMoney(ns.getServerMaxMoney(bestTarget) * 0.5)}`);
-			}
+			ns.clearLog();
+			ns.print(`Best server: ${bestTarget}`);
+			ns.print(`Targeting server: ${target}`);
+			ns.print(`Server security: ${Math.round(ns.getServerSecurityLevel(target))}`); // Rounding server security
+			ns.print(`Server money: ${formatMoney(ns.getServerMoneyAvailable(target))}`);
+			ns.print(`Weaken time: ${ns.tFormat(ns.getWeakenTime(target))}`);
+			ns.print(`Grow time: ${ns.tFormat(ns.getGrowTime(target))}`);
+			ns.print(`Hack time: ${ns.tFormat(ns.getHackTime(target))}`);
+			ns.print(`Potential money gain: ${formatMoney(ns.getServerMaxMoney(target) * 0.5)}`);
 		}
 	}
 
