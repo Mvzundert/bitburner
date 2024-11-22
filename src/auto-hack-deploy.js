@@ -33,7 +33,9 @@ export async function main(ns) {
 	}
 
 	function getNumCracks() {
-		return Object.keys(cracks).filter(file => ns.fileExists(file, homeServer)).length;
+		return Object.keys(cracks).filter(function (file) {
+			return ns.fileExists(file, homeServer);
+		}).length;
 	}
 
 	function penetrate(server) {
@@ -63,20 +65,29 @@ export async function main(ns) {
 		ns.exec(virus, server, maxThreads, target);
 	}
 
+	// Retrieves all nodes in the network using DFS
 	function getNetworkNodes() {
-		const visited = new Set();
-		const stack = ["home"];
+		var visited = {};
+		var stack = [];
+		var origin = ns.getHostname();
+		stack.push(origin);
 
 		while (stack.length > 0) {
-			const node = stack.pop();
-			if (!visited.has(node)) {
-				visited.add(node);
-				stack.push(...ns.scan(node));
+			var node = stack.pop();
+			if (!visited[node]) {
+				visited[node] = node;
+				var neighbours = ns.scan(node);
+				for (var i = 0; i < neighbours.length; i++) {
+					var child = neighbours[i];
+					if (visited[child]) {
+						continue;
+					}
+					stack.push(child);
+				}
 			}
 		}
-		return Array.from(visited);
+		return Object.keys(visited);
 	}
-
 	function canHack(server) {
 		const numCracks = getNumCracks();
 		const reqPorts = ns.getServerNumPortsRequired(server);
@@ -109,6 +120,10 @@ export async function main(ns) {
 	function getTargetServers() {
 		var networkNodes = getNetworkNodes();
 		const targets = networkNodes.filter(function (node) { return canHack(node); });
+
+		const bestTarget = getBestTarget();
+
+		targets.push(bestTarget);
 
 		// Add purchased servers
 		var i = 0;
