@@ -159,8 +159,6 @@ export async function main(ns) {
 			ns.print(`Grow time: ${ns.tFormat(ns.getGrowTime(target))}`);
 			ns.print(`Hack time: ${ns.tFormat(ns.getHackTime(target))}`);
 			ns.print(`Potential money gain: ${formatMoney(ns.getServerMaxMoney(target) * 0.5)}`);
-			ns.print(`Total Script Income: ${formatMoney(ns.getTotalScriptIncome )}`);
-			ns.print(`Total Script XP: ${ns.getTotalScriptExpGain}`);
 		}
 	}
 
@@ -198,8 +196,6 @@ export async function main(ns) {
 			ns.run("manageStocks.js");
 		}
 	}
-
-
 
 	while (true) {
 		var newTargets = getTargetServers();
