@@ -169,8 +169,6 @@ export async function main(ns) {
 	if (getPlayerMoney() > moneyThreshold) {
 		if (ns.scriptRunning("manageHacknet.js", homeServer)) {
 			ns.print(`Script to manage hacknet nodes is already running.`);
-
-			return;
 		} else {
 			ns.print(`Script to manage hacknet nodes is starting...`);
 			ns.run("manageHacknet.js");
@@ -178,8 +176,6 @@ export async function main(ns) {
 
 		if (ns.scriptRunning("auto-buy-exe.js", homeServer)) {
 			ns.print(`Script to auto purchase exe's is already running.`);
-
-			return;
 		} else {
 			ns.print(`Script to auto purchase exe's is starting...`);
 			//ns.run("auto-buy-exe.js");
@@ -189,8 +185,6 @@ export async function main(ns) {
 	if (stockSymbols.length > 0) {
 		if (ns.scriptRunning("manageStocks.js", homeServer)) {
 			ns.print(`Script to manage stocks is already running.`);
-
-			return;
 		} else {
 			ns.print(`Script to manage Stocks is starting...`);
 			ns.run("manageStocks.js");
